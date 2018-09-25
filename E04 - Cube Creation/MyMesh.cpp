@@ -17,22 +17,29 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		then call the AddTri function to generate a_nSubdivision number of faces
 	*/
 
+	// The center point will be constant
 	vector3 center = vector3(0.0f, 0.0f, 0.0f);
-	float angle = (2 * PI) / float(a_nSubdivisions);
 
-	float step = angle;
-
+	// The other two points will be calculated in the loop
 	vector3 pointB;
 	vector3 pointC;
 
+	// Create variables to pass to sine and cosine
+	float x;
+	float y;
+
+	// Loop around the circle and draw triangles
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
-		pointB = vector3(cos(angle), sin(angle), 0.0f);
+		// Calculate the values to pass to sine and cosine
+		x = (i * ((2 * PI) / a_nSubdivisions));
+		y = ((i + 1) * ((2 * PI) / a_nSubdivisions));
 
-		angle += step;
+		// Calculate the other vertices of eac triangle
+		pointB = vector3(cos(x) * a_fRadius, sin(x) * a_fRadius, 0.0f);
+		pointC = vector3(cos(y) * a_fRadius, sin(y) * a_fRadius, 0.0f);
 
-		pointC = vector3(cos(angle), sin(angle), 0.0f);
-
+		// Draw a triangle
 		AddTri(center, pointB, pointC);
 	}
 
