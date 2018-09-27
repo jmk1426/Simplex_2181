@@ -494,8 +494,43 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
+
+	// Get a top and bottom points (these will be constant)
+	vector3 topPoint(0, a_fRadius / 2, 0);
+	vector3 bottomPoint(0, -(a_fRadius / 2), 0);
+
+	// Fill out circles for the top and bottom of the sphere
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+	// Calculate the values to give to sin and cosine
+		float offsetX = 2 * PI * i;
+		float offsetY = 2 * PI * (i + 1);
+		float x = offsetX / a_nSubdivisions;
+		float y = offsetY / a_nSubdivisions;
+
+		// Calculate the first point on the bottom circle
+		vector3 point1(cos(x) * a_fRadius, bottomPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the bottom circle
+		vector3 point2(cos(y) * a_fRadius, bottomPoint.y, sin(y) * a_fRadius);
+
+		// Calculate the first point on the top circle
+		vector3 point3(cos(x) * a_fRadius, topPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the top circle
+		vector3 point4(cos(y) * a_fRadius, topPoint.y, sin(y) * a_fRadius);
+
+		vector3 point5((point2.x) / 2, (point4.y) / 2, (point1.z) + 1);
+
+		// Add 2 triangles, one on the bottom of the sphere and one on the top
+		AddTri(point2, (bottomPoint + bottomPoint), point1);
+		AddTri(point3, (topPoint + topPoint), point4);
+
+		// Add a quad to fill the space between the two circles
+		AddQuad(point2, point1, point4, point3);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
