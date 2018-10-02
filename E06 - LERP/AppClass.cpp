@@ -54,19 +54,45 @@ void Application::Display(void)
 	//calculate the current position
 	vector3 v3CurrentPos;
 	
-
-
-
-
 	//your code goes here
 	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 	//-------------------
 	
+	// Make a 2 vectors: 1 to hold the start of the current path and 1 to hold the end of it
+	vector3 start;
+	vector3 end;
 
+	//The path is basically an index that tells you which set of points to LERP between
+	static int path = 0;
 
-	
+	// Start at the current path
+	start = m_stopsList[path];
+
+	// End at the next path
+	// When we hit the final end point, path + 1 will throw an exception
+	// Using the modulus will allow us to reset to the first point when we hit the final end point
+	end = m_stopsList[(path + 1) % m_stopsList.size()];
+
+	// The percentage will hold how close you are to the start and end of the path
+	// Make a float for the max length of the animation between points
+	float fMax = 3.0f;
+	// Map the value to be between 0.0 and 1.0
+	float fPercent = MapValue(fTimer, 0.0f, fMax, 0.0f, 1.0f);
+
+	// Use glm::lerp to get the linear interpolation between the start and end of the route
+	v3CurrentPos = glm::lerp(start, end, fPercent);
+
+	// Translate the model to its current position
 	matrix4 m4Model = glm::translate(v3CurrentPos);
 	m_pModel->SetModelMatrix(m4Model);
+
+	// If the timer is greater than or equal to the maximum time of the animation, the animation needs to start again
+	if (fTimer >= fMax)
+	{
+		path++; // Go to the next path
+		fTimer = m_pSystem->GetDeltaTime(uClock); // Restart the timer
+		path %= m_stopsList.size(); // Make sure we are within bounds of the vector
+	}
 
 	m_pMeshMngr->Print("\nTimer: ");//Add a line on top
 	m_pMeshMngr->PrintLine(std::to_string(fTimer), C_YELLOW);
