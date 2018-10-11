@@ -45,6 +45,18 @@ private:
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
 
+	float fTimer; // timer of the orbit length
+	float fMax; // maximum length of time the orbits should take
+	uint uClock; // clock to be used with the timer
+	vector3 start; // the starting point of the current orbit
+	vector3 end; // the end point of the current orbit
+	std::vector<int> pathsList; // the segment of the orbit the sphere is currently on
+	std::vector<vector3> stopsList; // list of stops on the current orbit
+	std::vector<vector3> startsList; // list of starting points on the current orbit
+	std::vector<vector3> endsList; // list of end points on the current orbit
+	std::vector<std::vector<vector3>> varyingStopsList; // list of the list of different stops on each orbit 
+	matrix4 m4Model; // represents the model of the sphere
+
 public:
 #pragma region Constructor / Run / Destructor
 	/*
