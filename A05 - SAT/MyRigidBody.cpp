@@ -86,7 +86,6 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_m4ToWorld = a_m4ModelMatrix;
 
 	//Calculate the 8 corners of the cube
-	vector3 v3Corner[8];
 	//Back square
 	v3Corner[0] = m_v3MinL;
 	v3Corner[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
@@ -286,6 +285,23 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
+
+	//Local min and maxs
+	vector3 minLocal = GetMinLocal();
+	vector3 minLocalAsGlobal = vector3(m_m4ToWorld * vector4(minLocal, 1.0f));
+	vector3 maxLocal = GetMaxLocal();
+	vector3 maxLocalAsGlobal = vector3(m_m4ToWorld * vector4(maxLocal, 1.0f));
+
+	//vectro3[8] for the corners
+	vector3* points = v3Corner;
+
+	vector3 otherMinLocal = a_pOther->GetMinLocal();
+	vector3 otherMinLocalAsGlobal = vector3(m_m4ToWorld * vector4(otherMinLocal, 1.0f));
+	vector3 otherMaxLocal = a_pOther->GetMaxLocal();
+	vector3 otherMaxLocalAsGlobal = vector3(m_m4ToWorld * vector4(otherMaxLocal, 1.0f));
+
+	//vector3[8] for the corners
+	vector3* otherPoints = a_pOther->v3Corner;
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
