@@ -248,6 +248,8 @@ private:
 	OUTPUT: 0 for colliding, other = first axis that succeeds test
 	*/
 	uint SAT(MyRigidBody* const a_pOther);
+
+	bool ProjectionsOverlap(vector3 points[], vector3 otherPoints[], vector3 axis);
 };//class
 
 } //namespace Simplex

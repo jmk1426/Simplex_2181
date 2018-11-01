@@ -292,7 +292,7 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	vector3 maxLocal = GetMaxLocal();
 	vector3 maxLocalAsGlobal = vector3(m_m4ToWorld * vector4(maxLocal, 1.0f));
 
-	//vectro3[8] for the corners
+	//vectro3[8] for the corners of the model
 	vector3* points = v3Corner;
 
 	vector3 otherMinLocal = a_pOther->GetMinLocal();
@@ -300,9 +300,262 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	vector3 otherMaxLocal = a_pOther->GetMaxLocal();
 	vector3 otherMaxLocalAsGlobal = vector3(m_m4ToWorld * vector4(otherMaxLocal, 1.0f));
 
-	//vector3[8] for the corners
+	//vector3[8] for the corners of the other model
 	vector3* otherPoints = a_pOther->v3Corner;
+
+	/*
+	*	AX check
+	*/
+
+	//Get the Ax axis
+	//points[1] holds the value with max x, min y and z
+	vector3 inLocalXDirection = points[1];
+	vector3 Ax = glm::normalize(inLocalXDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Ax)) {
+		return eSATResults::SAT_AX;
+	}
+
+	/*
+	*	AY check
+	*/
+
+	//Get the Ay axis
+	//points[2] holds the value with max y, min x and z
+	vector3 inLocalYDirection = points[2];
+	vector3 Ay = glm::normalize(inLocalYDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Ay)) {
+		return eSATResults::SAT_AY;
+	}
+
+	/*
+	*	AZ check
+	*/
+
+	//Get the Az axis
+	//points[4] holds the value with max z, min x and y
+	vector3 inLocalZDirection = points[4];
+	vector3 Az = glm::normalize(inLocalZDirection - minLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Az)) {
+		return eSATResults::SAT_AZ;
+	}
+
+	/*
+	*	Bx check
+	*/
+
+	//Get the Bx Bxis
+	inLocalXDirection = otherPoints[1];
+	vector3 Bx = glm::normalize(inLocalXDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Bx)) {
+		return eSATResults::SAT_BX;
+	}
+
+	/*
+	*	BY check
+	*/
+
+	//Get the By axis
+	inLocalYDirection = otherPoints[2];
+	vector3 By = glm::normalize(inLocalYDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, By)) {
+		return eSATResults::SAT_BY;
+	}
+
+	/*
+	*	BZ check
+	*/
+
+	//Get the Bz axis
+	inLocalZDirection = otherPoints[4];
+	vector3 Bz = glm::normalize(inLocalZDirection - otherMinLocalAsGlobal);
+	if (!ProjectionsOverlap(points, otherPoints, Bz)) {
+		return eSATResults::SAT_BZ;
+	}
+
+	/*
+	*	Ax x Bx check
+	*/
+
+	//Get the Ax x Bx axis
+	vector3 AxBx = glm::normalize(glm::cross(Ax, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AxBx)) {
+		return eSATResults::SAT_AXxBX;
+	}
+
+	/*
+	*	Ax x By check
+	*/
+
+	//Get the Ax x By axis
+	vector3 AxBy = glm::normalize(glm::cross(Ax, By));
+	if (!ProjectionsOverlap(points, otherPoints, AxBy)) {
+		return eSATResults::SAT_AXxBY;
+	}
+
+	/*
+	*	Ax x Bz check
+	*/
+
+	//Get the Ax x Bz axis
+	vector3 AxBz = glm::normalize(glm::cross(Ax, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AxBz)) {
+		return eSATResults::SAT_AXxBZ;
+	}
+
+	/*
+	*	Ay x Bx check
+	*/
+
+	//Get the Ay x Bx axis
+	vector3 AyBx = glm::normalize(glm::cross(Ay, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AyBx)) {
+		return eSATResults::SAT_AYxBX;
+	}
+
+	/*
+	*	Ay x By check
+	*/
+
+	//Get the Ay x By axis
+	vector3 AyBy = glm::normalize(glm::cross(Ay, By));
+	if (!ProjectionsOverlap(points, otherPoints, AyBy)) {
+		return eSATResults::SAT_AYxBY;
+	}
+
+	/*
+	*	Ay x Bz check
+	*/
+
+	//Get the Ay x Bz axis
+	vector3 AyBz = glm::normalize(glm::cross(Ay, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AyBz)) {
+		return eSATResults::SAT_AYxBZ;
+	}
+
+	/*
+	*	Az x Bx check
+	*/
+
+	//Get the Az x Bx axis
+	vector3 AzBx = glm::normalize(glm::cross(Az, Bx));
+	if (!ProjectionsOverlap(points, otherPoints, AzBx)) {
+		return eSATResults::SAT_AZxBX;
+	}
+
+	/*
+	*	Az x By check
+	*/
+
+	//Get the Ax x By axis
+	vector3 AzBy = glm::normalize(glm::cross(Az, By));
+	if (!ProjectionsOverlap(points, otherPoints, AzBy)) {
+		return eSATResults::SAT_AZxBY;
+	}
+
+	/*
+	*	Az x Bz check
+	*/
+
+	//Get the Az x Bz axis
+	vector3 AzBz = glm::normalize(glm::cross(Az, Bz));
+	if (!ProjectionsOverlap(points, otherPoints, AzBz)) {
+		return eSATResults::SAT_AZxBZ;
+	}
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
+}
+
+bool MyRigidBody::ProjectionsOverlap(vector3 points[], vector3 otherPoints[], vector3 axis) {
+
+	//set min for both sets of points on the axis
+	//Assume the 1st point for both
+	vector3 min = points[0];
+	vector3 max = min;
+
+	vector3 otherMin = otherPoints[0];
+	vector3 otherMax = otherMin;
+
+	//Now loop through all the other points, find the real values
+	//Min means everything is in front of,
+	//Max means everything is behind
+	for (int i = 1; i < 8; i++) {
+
+		//Checking a new point in the first list
+		vector3 point = points[i];
+
+		//Is it behind the min?
+		vector3 differenceMin = point - min;
+		float dotMin = glm::dot(differenceMin, axis);
+		if (dotMin < 0) {
+			min = point;
+		}
+
+		//Is it in front of the max?
+		vector3 differenceMax = point - max;
+		float dotMax = glm::dot(differenceMax, axis);
+		if (dotMax > 0) {
+			max = point;
+		}
+
+		//Checking a new point in the other list
+		vector3 otherPoint = otherPoints[i];
+
+		//Is it behind the min?
+		vector3 otherDifferenceMin = otherPoint - otherMin;
+		float otherDotMin = glm::dot(otherDifferenceMin, axis);
+		if (otherDotMin < 0) {
+			otherMin = otherPoint;
+		}
+
+		//Is it in front of the max?
+		vector3 otherDifferenceMax = otherPoint - otherMax;
+		float otherDotMax = glm::dot(otherDifferenceMax, axis);
+		if (otherDotMax > 0) {
+			otherMax = otherPoint;
+		}
+	}
+
+	//Now we hav both min and maxs
+	//We need either both other points to be in front of both points or 
+	//bot other points to be behind both points
+
+	//Start by checking otherMax
+	vector3 differenceOtherMaxToMax = otherMax - max;
+	float dotOtherMaxToMax = glm::dot(differenceOtherMaxToMax, axis);
+
+	vector3 differenceOtherMaxToMin = otherMax - min;
+	float dotOtherMaxToMin = glm::dot(differenceOtherMaxToMin, axis);
+
+	bool otherMaxesInFront = false;
+	if (dotOtherMaxToMax > 0 && dotOtherMaxToMin > 0) {
+		otherMaxesInFront = true;
+	}
+	else if (dotOtherMaxToMax < 0 && dotOtherMaxToMin < 0) {
+		otherMaxesInFront = false;
+	}
+	else {
+		return true;
+	}
+
+	//Now lets look at the other min
+	vector3 differenceOtherMinToMax = otherMin - max;
+	float dotOtherMinToMax = glm::dot(differenceOtherMinToMax, axis);
+
+	vector3 differenceOtherMinToMin = otherMin - min;
+	float dotOtherMinToMin = glm::dot(differenceOtherMinToMin, axis);
+
+	bool otherMinsInFront = false;
+	if (dotOtherMinToMax > 0 && dotOtherMinToMin > 0) {
+		otherMinsInFront = true;
+	}
+	else if (dotOtherMinToMax < 0 && dotOtherMinToMin < 0) {
+		otherMinsInFront = false;
+	}
+	else {
+		return true;
+	}
+
+	//If they're differnet, collision still happened!
+	return (otherMaxesInFront != otherMinsInFront);
 }
