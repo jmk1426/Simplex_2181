@@ -53,6 +53,8 @@ void Application::DrawGUI(void)
 			ImGui::Text(" PageDw: Decrement Octant display\n");
 			ImGui::Separator();
 			ImGui::Text(" O: Toggle Optimization");
+			ImGui::Text(" Green = Optimized");
+			ImGui::Text(" Red = Not Optimized");
 			ImGui::Text(" V: Toggle Visibility");
 			ImGui::Separator();
 			ImGui::Text("	  -: Increment Octree subdivision\n");

@@ -457,7 +457,7 @@ void Simplex::MyEntityManager::DisplayOctree() {
 		m_pRoot->Display(C_GREEN);
 	}
 	else {
-		m_pRoot->Display(C_WHITE);
+		m_pRoot->Display(C_RED);
 	}
 }
 void Simplex::MyEntityManager::DestroyOctree() {
